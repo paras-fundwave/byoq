@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { decodeQuizCode } from '../utils/quizCodec'
 import { quizStore } from '../stores/quizStore'
@@ -10,6 +10,22 @@ const quizCode = ref('')
 const error = ref('')
 
 const pastQuizzes = computed(() => quizStore.getPastQuizzes())
+
+watch(quizCode, (newValue) => {
+  if (!newValue) return
+  
+  try {
+    const trimmed = newValue.trim()
+    if (trimmed.includes('?code=') || trimmed.includes('&code=')) {
+      const url = new URL(trimmed)
+      const code = url.searchParams.get('code')
+      if (code) {
+        quizCode.value = code
+      }
+    }
+  } catch {
+  }
+})
 
 onMounted(() => {
   // Check if code is in URL query param
@@ -80,7 +96,7 @@ function goToGenerate() {
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4">
-          <button @click="loadQuiz" class="btn btn-primary flex-1">
+          <button @click="loadQuiz" class="btn btn-primary flex-1 font-bold">
             START
           </button>
           <button @click="goToGenerate" class="btn btn-secondary flex-1">

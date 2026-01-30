@@ -4,7 +4,7 @@ fileignoreconfig:
 - filename: public/vite.svg
   checksum: 5fe742fa65b1dea8626174e639646dd7665eb5976ae9caa62855bc9bb33aeeb0
 - filename: src/pages/GenerateQuiz.vue
-  checksum: b81b70705708ea393d3f90d63dc9d74126a99f6f53cacf48a4ee871aa345f9ca
+  checksum: 949678875df2b74367165644030eec90b020c2a1be6f41eb817ca1b929ff4568
 - filename: src/pages/Landing.vue
   checksum: df31b7e08cf5b4142e6cb50c4c731fe2e7a8b7e258069309cf1bffff0e4e1228
 - filename: src/stores/quizStore.js

@@ -7,7 +7,9 @@ const router = useRouter()
 
 const jsonInput = ref('')
 const copied = ref(false)
+const linkCopied = ref(false)
 const templateCopied = ref(false)
+const previewStartIndex = ref(0)
 
 const sampleJson = {
   title: "Sample Quiz",
@@ -15,7 +17,6 @@ const sampleJson = {
   quiz: [
     {
       question: "What is 2 + 2?",
-      skippable: false,
       weight: 1,
       answerOptions: [
         { text: "3", rationale: "Incorrect. 2 + 2 equals 4, not 3.", isCorrect: false },
@@ -62,6 +63,42 @@ const generatedCode = computed(() => {
   return encodeQuizCode(parsedData.value)
 })
 
+const generatedLink = computed(() => {
+  if (!generatedCode.value) return ''
+  const baseUrl = window.location.origin + import.meta.env.BASE_URL
+  return `${baseUrl}?code=${generatedCode.value}`
+})
+
+const codePreview = computed(() => {
+  if (!generatedCode.value) return ''
+  const code = generatedCode.value
+  if (code.length <= 60) return code
+  return code.substring(0, 30) + '...' + code.substring(code.length - 20)
+})
+
+const previewQuestions = computed(() => {
+  if (!parsedData.value?.quiz) return []
+  return parsedData.value.quiz.slice(previewStartIndex.value, previewStartIndex.value + 2)
+})
+
+const canGoPrevPreview = computed(() => previewStartIndex.value > 0)
+const canGoNextPreview = computed(() => {
+  if (!parsedData.value?.quiz) return false
+  return previewStartIndex.value + 2 < parsedData.value.quiz.length
+})
+
+function prevPreview() {
+  if (canGoPrevPreview.value) {
+    previewStartIndex.value = Math.max(0, previewStartIndex.value - 2)
+  }
+}
+
+function nextPreview() {
+  if (canGoNextPreview.value) {
+    previewStartIndex.value += 2
+  }
+}
+
 async function copyTemplate() {
   await navigator.clipboard.writeText(placeholder)
   templateCopied.value = true
@@ -73,6 +110,13 @@ async function copyCode() {
   await navigator.clipboard.writeText(generatedCode.value)
   copied.value = true
   setTimeout(() => copied.value = false, 2000)
+}
+
+async function copyLink() {
+  if (!generatedLink.value) return
+  await navigator.clipboard.writeText(generatedLink.value)
+  linkCopied.value = true
+  setTimeout(() => linkCopied.value = false, 2000)
 }
 
 function goBack() {
@@ -144,32 +188,57 @@ function goBack() {
             
             <!-- Questions Preview -->
             <div v-if="parsedData.quiz?.length" class="space-y-4">
-              <p class="text-gray-400 text-base">{{ parsedData.quiz.length }} QUESTION(S)</p>
+              <div class="flex items-center justify-between">
+                <p class="text-gray-400 text-base">{{ parsedData.quiz.length }} QUESTION(S)</p>
+                <div class="flex gap-2">
+                  <button 
+                    @click="prevPreview" 
+                    :disabled="!canGoPrevPreview"
+                    class="btn btn-secondary py-2 px-4 text-sm"
+                    name="prev-preview-button"
+                  >
+                    ←
+                  </button>
+                  <button 
+                    @click="nextPreview" 
+                    :disabled="!canGoNextPreview"
+                    class="btn btn-secondary py-2 px-4 text-sm"
+                    name="next-preview-button"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
               
-              <div v-for="(q, i) in parsedData.quiz.slice(0, 3)" :key="i" class="p-4 bg-gray-700/50 border-4 border-gray-600">
-                <p class="text-base">{{ i + 1 }}. {{ q.question }}</p>
+              <div v-for="(q, i) in previewQuestions" :key="previewStartIndex + i" class="p-4 bg-gray-700/50 border-4 border-gray-600">
+                <p class="text-base">{{ previewStartIndex + i + 1 }}. {{ q.question }}</p>
                 <div class="flex gap-2 mt-3">
                   <span v-if="q.weight" class="badge bg-yellow-600 border-yellow-800">WT: {{ q.weight }}</span>
-                  <span v-if="q.skippable === false" class="badge bg-red-600 border-red-800">REQ</span>
                   <span v-if="q.hint" class="badge bg-blue-600 border-blue-800">HINT</span>
                 </div>
               </div>
               
-              <p v-if="parsedData.quiz.length > 3" class="text-gray-500 text-base">
-                +{{ parsedData.quiz.length - 3 }} more...
+              <p v-if="parsedData.quiz.length > 2" class="text-gray-500 text-sm text-center">
+                Showing {{ previewStartIndex + 1 }}-{{ Math.min(previewStartIndex + 2, parsedData.quiz.length) }} of {{ parsedData.quiz.length }}
               </p>
             </div>
-            
-            <!-- Generated Code Section (moved inside preview when valid) -->
-            <div v-if="isValid" class="mt-8 pt-6 border-t-4 border-gray-600">
-              <h3 class="text-lg mb-4 text-yellow-400">QUIZ CODE</h3>
-              <div class="bg-gray-900 border-4 border-gray-600 p-4 font-mono text-sm break-all max-h-32 overflow-y-auto">
-                {{ generatedCode }}
-              </div>
-              <button @click="copyCode" class="btn btn-success mt-4 w-full">
-                {{ copied ? '✓ COPIED!' : 'COPY CODE' }}
-              </button>
-            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Code Section - Compact Row -->
+      <div v-if="isValid" class="card mt-8">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div class="flex-1 bg-gray-900 border-4 border-gray-600 px-4 py-3 font-mono text-sm text-gray-400 truncate">
+            {{ codePreview }}
+          </div>
+          <div class="flex gap-4">
+            <button @click="copyCode" class="btn btn-success flex-1 sm:flex-none">
+              {{ copied ? '✓ COPIED!' : 'COPY CODE' }}
+            </button>
+            <button @click="copyLink" class="btn btn-primary flex-1 sm:flex-none">
+              {{ linkCopied ? '✓ COPIED!' : 'COPY LINK' }}
+            </button>
           </div>
         </div>
       </div>

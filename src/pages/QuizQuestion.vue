@@ -30,15 +30,21 @@ const currentQuestion = computed(() => {
 const isAnswered = computed(() => selectedOption.value !== null)
 
 const canGoNext = computed(() => {
-  if (quizStore.currentQuestionIndex >= quizStore.totalQuestions - 1) return false
-  if (!isAnswered.value && currentQuestion.value?.skippable === false) return false
-  return true
+  return quizStore.currentQuestionIndex < quizStore.totalQuestions - 1
 })
 
 const canGoPrev = computed(() => quizStore.currentQuestionIndex > 0)
 
 const isLastQuestion = computed(() => {
   return quizStore.currentQuestionIndex >= quizStore.totalQuestions - 1
+})
+
+const allQuestionsAnswered = computed(() => {
+  return quizStore.answers.length === quizStore.totalQuestions
+})
+
+const unansweredCount = computed(() => {
+  return quizStore.totalQuestions - quizStore.answers.length
 })
 
 function selectOption(index) {
@@ -74,13 +80,11 @@ function toggleHint() {
 
 function goNext() {
   if (!canGoNext.value) return
-  
   quizStore.currentQuestionIndex++
 }
 
 function goPrev() {
   if (!canGoPrev.value) return
-  
   quizStore.currentQuestionIndex--
 }
 
@@ -96,6 +100,7 @@ function resetQuestionState() {
 }
 
 function finishQuiz() {
+  if (!allQuestionsAnswered.value) return
   router.push('/summary')
 }
 </script>
@@ -170,16 +175,11 @@ function finishQuiz() {
               <!-- Show rationale for selected wrong answer or correct answer -->
               <p 
                 v-if="isAnswered && (showExplanations || index === selectedOption || option.isCorrect)"
-                class="mt-2 text-base leading-relaxed"
-                :class="option.isCorrect ? 'text-green-400' : 'text-gray-400'"
+                class="mt-2 text-base leading-relaxed text-gray-400"
               >
                 {{ option.rationale }}
               </p>
             </div>
-            
-            <!-- Result Icons -->
-            <span v-if="isAnswered && option.isCorrect" class="text-green-400 text-xl">✓</span>
-            <span v-else-if="isAnswered && index === selectedOption" class="text-red-400 text-xl">✗</span>
           </div>
         </div>
       </div>
@@ -192,7 +192,7 @@ function finishQuiz() {
             @click="toggleExplanations" 
             class="btn btn-secondary text-base"
           >
-            {{ showExplanations ? 'HIDE' : 'SHOW' }} ALL
+            {{ showExplanations ? 'HIDE' : 'SHOW' }} EXPLANATIONS
           </button>
         </div>
         
@@ -208,8 +208,7 @@ function finishQuiz() {
           <button 
             v-if="!isLastQuestion"
             @click="goNext" 
-            :disabled="!canGoNext"
-            class="btn btn-primary"
+            class="btn btn-primary font-bold"
           >
             NEXT →
           </button>
@@ -217,17 +216,17 @@ function finishQuiz() {
           <button 
             v-else
             @click="finishQuiz"
-            :disabled="!isAnswered"
-            class="btn btn-success"
+            :disabled="!allQuestionsAnswered"
+            class="btn btn-success font-bold"
           >
             FINISH
           </button>
         </div>
       </div>
 
-      <!-- Skip Warning -->
-      <p v-if="!isAnswered && currentQuestion.skippable === false" class="text-yellow-400 text-base mt-4 text-center">
-        ⚠️ This question is required
+      <!-- Unanswered Warning -->
+      <p v-if="isLastQuestion && !allQuestionsAnswered" class="text-yellow-400 text-base mt-4 text-center">
+        ⚠️ {{ unansweredCount }} question(s) unanswered. Answer all to finish.
       </p>
     </div>
   </div>

@@ -71,7 +71,7 @@ function goHome() {
         
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button @click="restartQuiz" class="btn btn-primary">
+          <button @click="restartQuiz" class="btn btn-primary font-bold">
             TRY AGAIN
           </button>
           <button @click="goHome" class="btn btn-secondary">

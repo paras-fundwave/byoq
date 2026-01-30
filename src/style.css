@@ -28,6 +28,10 @@ body {
   image-rendering: pixelated;
 }
 
+.btn[name="next-preview-button"], .btn[name="prev-preview-button"] {
+  @apply py-1;
+}
+
 .btn-primary {
   @apply bg-yellow-500 border-yellow-700 text-gray-900 hover:bg-yellow-400;
   box-shadow: inset -4px -4px 0px 0px rgba(0,0,0,0.2);
