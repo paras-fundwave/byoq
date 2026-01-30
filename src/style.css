@@ -1,0 +1,110 @@
+<<<<<<< Updated upstream
+=======
+@import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap');
+>>>>>>> Stashed changes
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@font-face {
+  font-family: 'Bitcount Single';
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  font-family: 'Bitcount Single';
+}
+
+body {
+  @apply bg-gray-900 text-gray-100 min-h-screen m-0;
+  font-family: 'Bitcount Single';
+}
+
+#app {
+  @apply min-h-screen;
+  font-family: 'Bitcount Single';
+}
+
+/* Blocky gamified button styles - Mario style */
+.btn {
+  @apply px-6 py-4 font-bold uppercase tracking-wider border-4 border-b-8 transition-all duration-100 active:border-b-4 active:translate-y-1 cursor-pointer text-base;
+  font-family: 'Bitcount Single';
+  image-rendering: pixelated;
+}
+
+.btn-primary {
+  @apply bg-yellow-500 border-yellow-700 text-gray-900 hover:bg-yellow-400;
+  box-shadow: inset -4px -4px 0px 0px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+  @apply bg-gray-600 border-gray-800 text-white hover:bg-gray-500;
+  box-shadow: inset -4px -4px 0px 0px rgba(0,0,0,0.2);
+}
+
+.btn-success {
+  @apply bg-green-500 border-green-700 text-gray-900 hover:bg-green-400;
+  box-shadow: inset -4px -4px 0px 0px rgba(0,0,0,0.2);
+}
+
+.btn-danger {
+  @apply bg-red-500 border-red-700 text-white hover:bg-red-400;
+  box-shadow: inset -4px -4px 0px 0px rgba(0,0,0,0.2);
+}
+
+.btn:disabled {
+  @apply opacity-50 cursor-not-allowed active:border-b-8 active:translate-y-0;
+}
+
+/* Card styles - Blocky Mario style */
+.card {
+  @apply bg-gray-800 border-8 border-gray-700 p-6;
+  box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.3);
+}
+
+/* Input styles */
+.input {
+  @apply w-full bg-gray-900 border-4 border-gray-600 p-4 text-gray-100 focus:border-yellow-500 focus:outline-none text-base;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
+}
+
+/* Option card styles - Blocky */
+.option-card {
+  @apply p-4 border-4 border-gray-600 bg-gray-800 cursor-pointer transition-all;
+  box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.3);
+}
+
+.option-card:hover:not(.disabled) {
+  @apply border-yellow-500 -translate-y-1;
+  box-shadow: 4px 8px 0px 0px rgba(0,0,0,0.3);
+}
+
+.option-card.selected {
+  @apply border-yellow-500 bg-yellow-900/30;
+}
+
+.option-card.correct {
+  @apply border-green-500 bg-green-900/30;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.option-card.incorrect {
+  @apply border-red-500 bg-red-900/30;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.option-card.disabled {
+  @apply cursor-default;
+}
+
+/* Pixel art style text */
+.pixel-text {
+  font-family: 'Bitcount Single';
+  text-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+}
+
+/* Badge styles */
+.badge {
+  @apply px-3 py-2 text-sm border-4;
+  box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.3);
+}
